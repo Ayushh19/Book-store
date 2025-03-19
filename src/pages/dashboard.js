@@ -1,7 +1,14 @@
+
+
+
+
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material"
-import Header from "../components/header"
-import BookList from "../components/bookList"
+import {  Routes, Route, Outlet } from "react-router-dom"
 import Footer from "../components/footer"
+import BookList from "../components/bookList"
+import BookDetail from "../components/bookDetails"
+import Header from "../components/header"
+
 
 // Create a custom theme
 const theme = createTheme({
@@ -34,15 +41,29 @@ const theme = createTheme({
   },
 })
 
+// Layout component that includes Header and Footer
+function Layout() {
+  return (
+    <>
+      <Header />
+      <Outlet />
+      <Footer />
+    </>
+  )
+}
+
 function Dashboard() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className="App">
-        <Header />
-        <BookList />
-        <Footer />
-      </div>
+      
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<BookList />} />
+            <Route path="book/:bookId" element={<BookDetail />} />
+          </Route>
+        </Routes>
+      
     </ThemeProvider>
   )
 }

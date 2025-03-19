@@ -1,158 +1,94 @@
+
+
+
+
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { Container, Typography, Grid, Box, FormControl, Select, MenuItem, InputLabel, Pagination } from "@mui/material"
 import BookCard from "./bookCard"
 
-// Sample data
-const sampleBooks = [
-  {
-    id: 1,
-    title: "Don't Make Me Think",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "https://m.media-amazon.com/images/I/51WS36aA2BL._SY445_SX342_.jpg",
-    outOfStock: false,
-  },
-  {
-    id: 2,
-    title: "React Material-UI",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "/images/Image22@2x.png",
-    outOfStock: false,
-  },
-  {
-    id: 3,
-    title: "Mastering SharePoint Framework",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "/images/Image23@2x.png",
-    outOfStock: false,
-  },
-  {
-    id: 4,
-    title: "UX For DUMMIES",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "https://m.media-amazon.com/images/I/51oXKWrcYYL._SY445_SX342_.jpg",
-    outOfStock: true,
-  },
-  {
-    id: 5,
-    title: "UX Design",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "/images/Image12@2x.png",
-    outOfStock: false,
-  },
-  {
-    id: 6,
-    title: "Group Discussion",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "https://m.media-amazon.com/images/I/51Kwaw5nInL._SY445_SX342_.jpg",
-    outOfStock: false,
-  },
-  {
-    id: 7,
-    title: "Lean UX",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "/images/Image13@2x.png",
-    outOfStock: false,
-  },
-  {
-    id: 8,
-    title: "The Design of Everyday Things",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "/images/Image7@2x.png",
-    outOfStock: false,
-  },
-  {
-    id: 9,
-    title: "The Design of Everyday Things",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "/images/Image8@2x.png",
-    outOfStock: false,
-  },
-  {
-    id: 10,
-    title: "The Design of Everyday Things",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "/images/Image10@2x.png",
-    outOfStock: false,
-  },
-  {
-    id: 11,
-    title: "The Design of Everyday Things",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "/images/Image36@2x.png",
-    outOfStock: false,
-  },
-  {
-    id: 12,
-    title: "The Design of Everyday Things",
-    author: "Steve Krug",
-    rating: 4.5,
-    reviews: 20,
-    price: 1500,
-    originalPrice: 2000,
-    imageUrl: "/images/Image11@2x.png",
-    outOfStock: false,
-  },
-]
-
 function BookList() {
+  const [books, setBooks] = useState([])
   const [sortBy, setSortBy] = useState("relevance")
   const [page, setPage] = useState(1)
-  const booksPerPage = 8
-  const totalBooks = 128 // From the image "(128 items)"
-  const totalPages = Math.ceil(totalBooks / booksPerPage)
+  const [loading, setLoading] = useState(true)
+  const booksPerPage = 12 // Changed to 12 as requested
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Fetch books data
+    fetch("https://bookstore.incubation.bridgelabz.com/bookstore_user/get/book")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success && data.result) {
+          setBooks(data.result)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error("Error fetching books:", error)
+        setLoading(false)
+      })
+  }, [])
 
   const handleSortChange = (event) => {
     setSortBy(event.target.value)
+    setPage(1) // Reset to first page when sorting changes
   }
 
   const handlePageChange = (event, value) => {
     setPage(value)
+  }
+
+  const handleBookClick = (bookId) => {
+    navigate(`book/${bookId}`)
+  }
+
+  // Calculate pagination
+  const totalBooks = books.length
+  const totalPages = Math.ceil(totalBooks / booksPerPage)
+  const startIndex = (page - 1) * booksPerPage
+  const endIndex = startIndex + booksPerPage
+
+  // Sort books based on selected option
+  const getSortedBooks = () => {
+    const sortedBooks = [...books]
+    switch (sortBy) {
+      case "price-low":
+        return sortedBooks.sort((a, b) => a.discountPrice - b.discountPrice)
+      case "price-high":
+        return sortedBooks.sort((a, b) => b.discountPrice - a.discountPrice)
+      case "newest":
+        return sortedBooks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      default:
+        return sortedBooks
+    }
+  }
+
+  // Get current page books
+  const currentBooks = getSortedBooks().slice(startIndex, endIndex)
+
+  // Transform book data to match our BookCard component props
+  const transformBookData = (book) => ({
+    id: book._id,
+    title: book.bookName,
+    author: book.author,
+    rating: 4.5, // Default rating since it's not in the API data
+    reviews: 20, // Default reviews since it's not in the API data
+    price: book.discountPrice,
+    originalPrice: book.price,
+    imageUrl: book.bookImage || `/placeholder.svg?height=200&width=150`, // Use placeholder if no image
+    outOfStock: book.quantity === 0,
+  })
+
+  if (loading) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Typography>Loading books...</Typography>
+      </Container>
+    )
   }
 
   return (
@@ -175,26 +111,29 @@ function BookList() {
             onChange={handleSortChange}
             size="small"
           >
-            <MenuItem value="relevance">relevance</MenuItem>
+            <MenuItem value="relevance">Relevance</MenuItem>
             <MenuItem value="price-low">Price: Low to High</MenuItem>
             <MenuItem value="price-high">Price: High to Low</MenuItem>
-            <MenuItem value="rating">Rating</MenuItem>
-            <MenuItem value="newest">Newest</MenuItem>
+            <MenuItem value="newest">Newest First</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
       <Grid container spacing={3}>
-        {sampleBooks.map((book) => (
-          <Grid item key={book.id} xs={12} sm={6} md={3}>
-            <BookCard book={book} />
+        {currentBooks.map((book) => (
+          <Grid item key={book._id} xs={12} sm={6} md={3} onClick={() => handleBookClick(book._id)}>
+            <div style={{ cursor: "pointer" }}>
+              <BookCard book={transformBookData(book)} />
+            </div>
           </Grid>
         ))}
       </Grid>
 
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-        <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
-      </Box>
+      {totalPages > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
+        </Box>
+      )}
     </Container>
   )
 }

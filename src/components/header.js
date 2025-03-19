@@ -109,7 +109,7 @@ function Header() {
         <Box sx={{ display: { xs: "flex", md: "flex" } }}>
           <IconButton size="large" color="inherit">
             <IconContainer>
-              <Badge badgeContent={4} color="error">
+              <Badge badgeContent={0} color="error">
                 <ShoppingCartIcon />
               </Badge>
               <Typography variant="caption">Cart</Typography>
