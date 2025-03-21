@@ -43,7 +43,7 @@ export default function LoginForm() {
   
       if (accessToken) {
         localStorage.setItem("accessToken", accessToken); // Set accessToken first
-        alert("Login Successful! 🎉");
+        // alert("Login Successful! 🎉");
         navigate("/dashboard"); // Then navigate
       }
     } catch (error) {

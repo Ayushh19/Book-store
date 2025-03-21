@@ -23,7 +23,7 @@ const categoryImages = {
   React: "/images/Image36@2x.png",
   SharePoint: "/images/Image22@2x.png",
   Web: "/images/Image20@2x.png",
-  default: "/images/Image10@2x.png",
+  // default: "/images/Image10@2x.png",
 }
 
 // Keywords to category mapping
