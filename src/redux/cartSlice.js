@@ -1,6 +1,3 @@
-
-
-
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 
 // Async thunk for adding item to cart

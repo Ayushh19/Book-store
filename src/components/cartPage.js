@@ -1,7 +1,3 @@
-
-
-
-
 "use client"
 
 import { useEffect, useState } from "react"
@@ -21,7 +17,7 @@ import {
 } from "@mui/material"
 import { Add, Remove, LocationOn, KeyboardArrowDown } from "@mui/icons-material"
 import { fetchCartItems, removeCartItem, updateCartItemQty } from "../redux/cartSlice"
-import { getRandomBookImage } from "../utils/bookImages"
+import { getRandomBookImage} from "../utils/bookImages"
 
 const QuantityButton = styled(IconButton)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
@@ -61,7 +57,7 @@ function CartPage() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { items, loading, error } = useSelector((state) => state.cart)
-  const [address, setAddress] = useState("At post - Nere, Tal - Panvel, No...")
+  const [address, setAddress] = useState("At post - Nere , Tal - Panvel , Dist...")
 
   useEffect(() => {
     // Fetch cart items when component mounts

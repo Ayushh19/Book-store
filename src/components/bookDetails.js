@@ -1,6 +1,3 @@
-
-
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -22,7 +19,7 @@ import {
   IconButton,
 } from "@mui/material"
 import { Favorite, Home, Add, Remove } from "@mui/icons-material"
-import { getBookThumbnails, getRandomBookImage} from "../utils/bookImages"
+import { getBookThumbnails,  getRandomBookImage } from "../utils/bookImages"
 import { addToCart, addItemLocally } from "../redux/cartSlice"
 
 const RatingBadge = styled(Box)(({ theme }) => ({
@@ -82,7 +79,7 @@ function BookDetail() {
 
   useEffect(() => {
     // Fetch book data
-    fetch("https://bookstore.incubation.bridgelabz.com/bookstore_user/get/book")
+    fetch("https://hebbkx1anhila5yf.public.blob.vercel-storage.com/snippet-yfqSAUCDKMZDzsqfk8dUt2t12Jb2nE.txt")
       .then((response) => response.json())
       .then((data) => {
         if (data.success && data.result) {

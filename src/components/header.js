@@ -1,8 +1,3 @@
-
-
-
-
-
 "use client"
 
 import { useState } from "react"
@@ -103,6 +98,11 @@ function Header() {
     setProfileMenuAnchor(null)
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken"); // ✅ Remove access token
+    navigate("/login"); // ✅ Redirect to login
+  };
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
   }
@@ -187,7 +187,7 @@ function Header() {
         <MenuItem onClick={handleProfileMenuClose}>Orders</MenuItem>
         <MenuItem onClick={handleProfileMenuClose}>Wishlist</MenuItem>
         <Divider />
-        <MenuItem onClick={handleProfileMenuClose}>Logout</MenuItem>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
 
       {/* Mobile Menu Drawer */}
@@ -236,6 +236,4 @@ function Header() {
 }
 
 export default Header
-
-
 
