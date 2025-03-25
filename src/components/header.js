@@ -106,6 +106,7 @@ function Header() {
   const handleWishlistClick = () => {
     // Navigate to the wishlist page
     navigate("/dashboard/wishlist")
+    handleProfileMenuClose();
   }
 
   const toggleMobileMenu = () => {
