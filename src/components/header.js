@@ -218,8 +218,8 @@ function Header() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleProfileMenuClose}>My Account</MenuItem>
-        <MenuItem onClick={handleProfileMenuClose}>Orders</MenuItem>
+        {/* <MenuItem onClick={handleProfileMenuClose}>My Account</MenuItem> */}
+        {/* <MenuItem onClick={handleProfileMenuClose}>Orders</MenuItem> */}
         <MenuItem onClick={handleWishlistClick}>Wishlist</MenuItem>
         <Divider />
         <MenuItem onClick={handleLogout}>Logout</MenuItem>

@@ -142,8 +142,8 @@ function CartPage() {
   const handleCheckout = () => {
     // Implement checkout logic
     console.log("Proceeding to checkout...")
-    alert("Order placed successfully!")
-    navigate("/")
+    // alert("Order placed successfully!")
+    navigate("/dashboard/order")
   }
 
   // Combine API items and local cart items
@@ -501,7 +501,13 @@ function CartPage() {
               </Box>
             )
           })}
-
+           <Divider sx={{ my: 2 }} />
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+          <Typography variant="subtitle1">Total Price:</Typography>
+          <Typography variant="subtitle1" fontWeight="bold">
+            Rs. {totalPrice}
+          </Typography>
+        </Box>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
             <Button
               variant="contained"
@@ -524,3 +530,5 @@ function CartPage() {
 }
 
 export default CartPage
+
+

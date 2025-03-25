@@ -139,7 +139,8 @@ function BookList() {
       </Box>
 
       <Grid container spacing={3}
-      sx={{ marginLeft: "-7.5px" }}>
+      sx={{ marginLeft: "11px" }}
+      columnSpacing={0.4}>
         {currentBooks.map((book) => (
           <Grid item key={book._id} xs={12} sm={6} md={3} onClick={() => handleBookClick(book._id)}>
             <div style={{ cursor: "pointer" }}>

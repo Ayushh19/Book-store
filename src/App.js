@@ -18,6 +18,7 @@ import { Provider } from "react-redux"
 import { store } from "./redux/store"
 import CartPage from "./components/cartPage"
 import WishlistPage from "./components/wishlist"
+import OrderSuccess from "./components/orderSuccess"
 
 
 const theme = createTheme({
@@ -60,6 +61,7 @@ function DashboardLayout() {
         <Route path="book/:bookId" element={<BookDetail />} />
         <Route path="cart" element={<CartPage />} />
         <Route path="wishlist" element={<WishlistPage />} />
+        <Route path="order" element={<OrderSuccess />} />
       </Routes>
       <Footer />
     </>

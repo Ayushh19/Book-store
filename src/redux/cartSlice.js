@@ -140,6 +140,11 @@ const cartSlice = createSlice({
     updateCartCount: (state, action) => {
       state.totalItems = action.payload
     },
+    clearLocalCart: (state) => {
+      state.localCart = []
+      state.items = []
+      state.totalItems = 0
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -220,6 +225,6 @@ const cartSlice = createSlice({
   },
 })
 
-export const { addItemLocally, updateCartCount } = cartSlice.actions
+export const { addItemLocally, updateCartCount,clearLocalCart } = cartSlice.actions
 export default cartSlice.reducer
 
