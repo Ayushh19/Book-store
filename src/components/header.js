@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useSelector, useDispatch } from "react-redux"
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import {
   AppBar,
   Toolbar,
@@ -21,16 +21,16 @@ import {
   ListItemText,
   Divider,
   Container,
-} from "@mui/material"
+} from "@mui/material";
 import {
   Search as SearchIcon,
   Person as PersonIcon,
   ShoppingCart as ShoppingCartIcon,
   Menu as MenuIcon,
   Close as CloseIcon,
-} from "@mui/icons-material"
-import BookIcon from "@mui/icons-material/MenuBook"
-import CartDrawer from "./cartDrawer"
+} from "@mui/icons-material";
+import BookIcon from "@mui/icons-material/MenuBook";
+import CartDrawer from "./cartDrawer";
 
 // Styled components
 const Search = styled("div")(({ theme }) => ({
@@ -47,7 +47,7 @@ const Search = styled("div")(({ theme }) => ({
     marginLeft: theme.spacing(3),
     width: "auto",
   },
-}))
+}));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -57,7 +57,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-}))
+}));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
@@ -71,7 +71,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
       width: "40ch",
     },
   },
-}))
+}));
 
 const IconContainer = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -79,33 +79,38 @@ const IconContainer = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   fontSize: "0.75rem",
-}))
+}));
 
 function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [profileMenuAnchor, setProfileMenuAnchor] = useState(null)
-  const navigate = useNavigate()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
+  const navigate = useNavigate();
 
   // Get cart count from Redux store
-  const cartCount = useSelector((state) => state.cart.totalItems)
-  const dispatch = useDispatch()
+  const cartCount = useSelector((state) => state.cart.totalItems);
+  const dispatch = useDispatch();
 
   const handleProfileMenuOpen = (event) => {
-    setProfileMenuAnchor(event.currentTarget)
-  }
+    setProfileMenuAnchor(event.currentTarget);
+  };
 
   const handleProfileMenuClose = () => {
-    setProfileMenuAnchor(null)
-  }
+    setProfileMenuAnchor(null);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken"); // ✅ Remove access token
     navigate("/login"); // ✅ Redirect to login
   };
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
+  const handleWishlistClick = () => {
+    // Navigate to the wishlist page
+    navigate("/dashboard/wishlist")
   }
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   return (
     <>
@@ -125,26 +130,55 @@ function Header() {
             </IconButton>
 
             {/* Logo */}
-            <Link to="/" style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center" }}>
+            <Link
+              to="/"
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               <BookIcon sx={{ mr: 1 }} />
-              <Typography variant="h6" noWrap component="div" sx={{ display: { xs: "none", sm: "block" } }}>
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{ display: { xs: "none", sm: "block" } }}
+              >
                 Bookstore
               </Typography>
             </Link>
 
             {/* Search Bar */}
-            <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
-              <Search>
-                <SearchIconWrapper>
+            <Box
+              sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}
+            >
+             
+              <Search sx={{ backgroundColor: "white" }}>
+                <SearchIconWrapper sx={{ color: "#6b6b6b" , opacity: 0.7 }}>
+                  {" "}
+                  {/* Darker Grey for Icon */}
                   <SearchIcon />
                 </SearchIconWrapper>
-                <StyledInputBase placeholder="Search..." inputProps={{ "aria-label": "search" }} />
+                <StyledInputBase
+                  placeholder="Search..."
+                  inputProps={{ "aria-label": "search" }}
+                  sx={{
+                    color: "#6b6b6b", // Dark Grey for text
+                    "&::placeholder": { color: "#6b6b6b", opacity: 1 }, // Ensure placeholder matches
+                  }}
+                />
               </Search>
             </Box>
 
             {/* Profile Icon */}
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <IconButton size="large" color="inherit" onClick={handleProfileMenuOpen}>
+              <IconButton
+                size="large"
+                color="inherit"
+                onClick={handleProfileMenuOpen}
+              >
                 <IconContainer>
                   <PersonIcon />
                   <Typography variant="caption">Profile</Typography>
@@ -159,7 +193,7 @@ function Header() {
                 color="inherit"
                 onClick={() => {
                   // Navigate to the correct path with dashboard prefix
-                  navigate("/dashboard/cart")
+                  navigate("/dashboard/cart");
                 }}
                 aria-label="go to cart"
               >
@@ -185,7 +219,7 @@ function Header() {
       >
         <MenuItem onClick={handleProfileMenuClose}>My Account</MenuItem>
         <MenuItem onClick={handleProfileMenuClose}>Orders</MenuItem>
-        <MenuItem onClick={handleProfileMenuClose}>Wishlist</MenuItem>
+        <MenuItem onClick={handleWishlistClick}>Wishlist</MenuItem>
         <Divider />
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
@@ -193,7 +227,14 @@ function Header() {
       {/* Mobile Menu Drawer */}
       <Drawer anchor="left" open={mobileMenuOpen} onClose={toggleMobileMenu}>
         <Box sx={{ width: 250 }} role="presentation">
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", p: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              p: 2,
+            }}
+          >
             <Typography variant="h6">Menu</Typography>
             <IconButton onClick={toggleMobileMenu}>
               <CloseIcon />
@@ -219,8 +260,8 @@ function Header() {
             <ListItem
               button
               onClick={() => {
-                navigate("/dashboard/cart")
-                toggleMobileMenu()
+                navigate("/dashboard/cart");
+                toggleMobileMenu();
               }}
             >
               <ListItemText primary="Cart" />
@@ -232,8 +273,7 @@ function Header() {
       {/* Cart Drawer */}
       <CartDrawer open={false} onClose={() => {}} />
     </>
-  )
+  );
 }
 
-export default Header
-
+export default Header;

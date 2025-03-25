@@ -9,6 +9,7 @@ import CartPage from "./components/CartPage"
 import Footer from "./components/footer"
 import { Box } from "@mui/material"
 import { Dashboard } from "@mui/icons-material"
+import WishlistPage from "../components/wishlist"
 
 // Create a custom theme
 const theme = createTheme({
@@ -98,6 +99,7 @@ function Dashboard() {
               <Route index element={<BookList />} />
               <Route path="book/:bookId" element={<BookDetail />} />
               <Route path="cart" element={<CartPage />} />
+              <Route path="wishlist" element={<WishlistPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

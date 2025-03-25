@@ -17,6 +17,7 @@ import ProtectedRoute from "./routes/ProtectedRoute"
 import { Provider } from "react-redux"
 import { store } from "./redux/store"
 import CartPage from "./components/cartPage"
+import WishlistPage from "./components/wishlist"
 
 
 const theme = createTheme({
@@ -58,6 +59,7 @@ function DashboardLayout() {
         <Route index element={<BookList />} />
         <Route path="book/:bookId" element={<BookDetail />} />
         <Route path="cart" element={<CartPage />} />
+        <Route path="wishlist" element={<WishlistPage />} />
       </Routes>
       <Footer />
     </>

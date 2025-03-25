@@ -112,7 +112,7 @@ function BookList() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3, padding: 2.15 }}>
         <Typography variant="h4" component="h1">
           Books{" "}
           <Typography component="span" color="text.secondary">
@@ -138,7 +138,8 @@ function BookList() {
         </FormControl>
       </Box>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3}
+      sx={{ marginLeft: "-7.5px" }}>
         {currentBooks.map((book) => (
           <Grid item key={book._id} xs={12} sm={6} md={3} onClick={() => handleBookClick(book._id)}>
             <div style={{ cursor: "pointer" }}>
