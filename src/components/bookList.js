@@ -1,10 +1,12 @@
 
 
 
+
 "use client"
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { useSelector } from "react-redux"
 import { Container, Typography, Grid, Box, FormControl, Select, MenuItem, InputLabel, Pagination } from "@mui/material"
 import BookCard from "./bookCard"
 import { getBookImage, getRandomBookImage } from "../utils/bookImages"
@@ -16,6 +18,8 @@ function BookList() {
   const [loading, setLoading] = useState(true)
   const booksPerPage = 12 // Changed to 12 as requested
   const navigate = useNavigate()
+
+  const searchQuery = useSelector((state) => state.search.query)
 
   useEffect(() => {
     // Fetch books data
@@ -63,15 +67,14 @@ function BookList() {
     navigate(`book/${bookId}`)
   }
 
-  // Calculate pagination
-  const totalBooks = books.length
-  const totalPages = Math.ceil(totalBooks / booksPerPage)
-  const startIndex = (page - 1) * booksPerPage
-  const endIndex = startIndex + booksPerPage
+  // Filter books based on search query
+  const filteredBooks = searchQuery
+    ? books.filter((book) => book.bookName.toLowerCase().includes(searchQuery.toLowerCase()))
+    : books
 
-  // Sort books based on selected option
+  // Sort filtered books based on selected option
   const getSortedBooks = () => {
-    const sortedBooks = [...books]
+    const sortedBooks = [...filteredBooks]
     switch (sortBy) {
       case "price-low":
         return sortedBooks.sort((a, b) => a.discountPrice - b.discountPrice)
@@ -83,6 +86,17 @@ function BookList() {
         return sortedBooks
     }
   }
+
+  // Calculate pagination
+  const totalBooks = books.length
+  const totalPages = Math.ceil(totalBooks / booksPerPage)
+  const startIndex = (page - 1) * booksPerPage
+  const endIndex = startIndex + booksPerPage
+  const sortedBooks = getSortedBooks()
+  const totalFilteredBooks = sortedBooks.length
+  const totalFilteredPages = Math.ceil(totalFilteredBooks / booksPerPage)
+
+ 
 
   // Get current page books
   const currentBooks = getSortedBooks().slice(startIndex, endIndex)
@@ -115,8 +129,8 @@ function BookList() {
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3, padding: 2.15 }}>
         <Typography variant="h4" component="h1">
           Books{" "}
-          <Typography component="span" color="text.secondary">
-            ({totalBooks} items)
+<Typography component="span" color="text.secondary">
+            ({totalFilteredBooks} {searchQuery ? "matching items" : "items"})
           </Typography>
         </Typography>
 
@@ -150,9 +164,15 @@ function BookList() {
         ))}
       </Grid>
 
+  {currentBooks.length === 0 && (
+        <Box sx={{ width: "100%", textAlign: "center", py: 4 }}>
+          <Typography variant="h6">No books found matching "{searchQuery}"</Typography>
+        </Box>
+      )}
+
       {totalPages > 1 && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-          <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
+          <Pagination count={totalFilteredPages} page={page} onChange={handlePageChange} color="primary" />
         </Box>
       )}
     </Container>

@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import { useState } from "react";
@@ -28,9 +30,11 @@ import {
   ShoppingCart as ShoppingCartIcon,
   Menu as MenuIcon,
   Close as CloseIcon,
+  Clear as ClearIcon,
 } from "@mui/icons-material";
 import BookIcon from "@mui/icons-material/MenuBook";
 import CartDrawer from "./cartDrawer";
+import { setSearchQuery, clearSearchQuery } from "../redux/searchSlice"
 
 // Styled components
 const Search = styled("div")(({ theme }) => ({
@@ -86,9 +90,20 @@ function Header() {
   const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
   const navigate = useNavigate();
 
+
   // Get cart count from Redux store
   const cartCount = useSelector((state) => state.cart.totalItems);
   const dispatch = useDispatch();
+ const searchQuery = useSelector((state) => state.search.query)
+
+
+ const handleSearchChange = (event) => {
+    dispatch(setSearchQuery(event.target.value))
+  }
+
+  const handleClearSearch = () => {
+    dispatch(clearSearchQuery())
+  }
 
   const handleProfileMenuOpen = (event) => {
     setProfileMenuAnchor(event.currentTarget);
@@ -151,25 +166,37 @@ function Header() {
               </Typography>
             </Link>
 
-            {/* Search Bar */}
-            <Box
-              sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}
-            >
-             
-              <Search sx={{ backgroundColor: "white" }}>
-                <SearchIconWrapper sx={{ color: "#6b6b6b" , opacity: 0.7 }}>
-                  {" "}
-                  {/* Darker Grey for Icon */}
+      {/* Search Bar */}
+            <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+              <Search sx={{ backgroundColor: "white", position: "relative" }}>
+                <SearchIconWrapper sx={{ color: "#6b6b6b", opacity: 0.7 }}>
                   <SearchIcon />
                 </SearchIconWrapper>
                 <StyledInputBase
                   placeholder="Search..."
                   inputProps={{ "aria-label": "search" }}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                   sx={{
                     color: "#6b6b6b", // Dark Grey for text
                     "&::placeholder": { color: "#6b6b6b", opacity: 1 }, // Ensure placeholder matches
                   }}
                 />
+                {searchQuery && (
+                  <IconButton
+                    size="small"
+                    onClick={handleClearSearch}
+                    sx={{
+                      position: "absolute",
+                      right: 8,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: "#6b6b6b",
+                    }}
+                  >
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                )}
               </Search>
             </Box>
 
@@ -278,3 +305,4 @@ function Header() {
 }
 
 export default Header;
+
