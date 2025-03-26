@@ -77,6 +77,10 @@ function BookDetail() {
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState("")
   const [wishlistLoading, setWishlistLoading] = useState(false)
+const [feedbacks, setFeedbacks] = useState([])
+const [feedbackLoading, setFeedbackLoading] = useState(false)
+const [feedbackError, setFeedbackError] = useState(null)
+const [submitFeedbackLoading, setSubmitFeedbackLoading] = useState(false)
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -127,6 +131,100 @@ function BookDetail() {
         setLoading(false)
       })
   }, [bookId])
+
+useEffect(() => {
+  if (book) {
+    fetchFeedbacks(book.id)
+  }
+}, [book])
+
+const fetchFeedbacks = async (productId) => {
+  setFeedbackLoading(true)
+  setFeedbackError(null)
+  try {
+    const token = localStorage.getItem("accessToken") || "dummy-token"
+    const response = await axios.get(
+      `https://bookstore.incubation.bridgelabz.com/bookstore_user/get/feedback/${productId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": token,
+        },
+      },
+    )
+    if (response.data && response.data.result) {
+      setFeedbacks(response.data.result)
+    } else {
+      setFeedbacks([])
+    }
+  } catch (error) {
+    console.error("Error fetching feedback:", error)
+    setFeedbackError("Failed to load reviews. Please try again later.")
+  } finally {
+    setFeedbackLoading(false)
+  }
+}
+
+
+const handleSubmitReview = async (e) => {
+  e.preventDefault()
+
+  if (!userRating) {
+    alert("Please select a rating")
+    return
+  }
+
+  if (!review.trim()) {
+    alert("Please write a review")
+    return
+  }
+
+  setSubmitFeedbackLoading(true)
+
+  try {
+    const token = localStorage.getItem("accessToken") || "dummy-token"
+
+    const response = await axios.post(
+      `https://bookstore.incubation.bridgelabz.com/bookstore_user/add/feedback/${book.id}`,
+      {
+        rating: userRating,
+        comment: review,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": token,
+        },
+      },
+    )
+
+    if (response.data && response.data.success) {
+      // Add the new feedback to the list
+      const newFeedback = {
+        _id: response.data.result?._id || Date.now().toString(),
+        rating: userRating,
+        comment: review,
+        user_id: {
+          fullName: "You", // Since we don't know the user's name
+        },
+      }
+
+      setFeedbacks([newFeedback, ...feedbacks])
+
+      // Reset form
+      setUserRating(0)
+      setReview("")
+
+      // alert("Review submitted successfully!")
+    }
+  } catch (error) {
+    console.error("Error submitting feedback:", error)
+    alert("Failed to submit review. Please try again.")
+  } finally {
+    setSubmitFeedbackLoading(false)
+  }
+}
+
 
 
    // Check if book is in wishlist
@@ -199,15 +297,6 @@ function BookDetail() {
   const handleBackToList = () => {
     navigate("/")
   }
-
-  const handleSubmitReview = (e) => {
-    e.preventDefault()
-    console.log("Review submitted:", { rating: userRating, review })
-    // Reset form
-    setUserRating(0)
-    setReview("")
-  }
-
 
   const handleQuantityChange = (newQuantity) => {
     if (newQuantity >= 1) {
@@ -354,20 +443,6 @@ function BookDetail() {
               >
                 {cartLoading ? "ADDING..." : "ADD TO BAG"}
               </Button>
-              {/* <Button
-                variant="contained"
-                fullWidth
-                startIcon={<Favorite />}
-                sx={{
-                  bgcolor: "#333",
-                  "&:hover": { bgcolor: "#222" },
-                  py: 1.5,
-                }}
-                onClick={handleAddToWishlist}
-                disabled={isAddedToWishlist}
-              >
-                {isAddedToWishlist ? "ADDED" : "WISHLIST"}
-              </Button> */}
                <Button
                 variant="contained"
                 fullWidth
@@ -429,52 +504,93 @@ function BookDetail() {
           </Typography>
 
           <Divider sx={{ my: 3 }} />
+ {/* Customer Feedback */}
+ <Typography variant="h6" component="h2" gutterBottom>
+ Customer Feedback
+</Typography>
 
-          {/* Customer Feedback */}
-          <Typography variant="h6" component="h2" gutterBottom>
-            Customer Feedback
-          </Typography>
+<Box component="form" onSubmit={handleSubmitReview} sx={{ mt: 3 }}>
+ <Typography variant="subtitle1" gutterBottom>
+   Overall rating
+ </Typography>
+ <Rating
+   name="user-rating"
+   value={userRating}
+   onChange={(event, newValue) => {
+     setUserRating(newValue)
+   }}
+   size="large"
+   sx={{ mb: 2 }}
+ />
 
-          <Box component="form" onSubmit={handleSubmitReview} sx={{ mt: 3 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Overall rating
-            </Typography>
-            <Rating
-              name="user-rating"
-              value={userRating}
-              onChange={(event, newValue) => {
-                setUserRating(newValue)
-              }}
-              size="large"
-              sx={{ mb: 2 }}
-            />
+ <TextField
+   fullWidth
+   multiline
+   rows={4}
+   placeholder="Write your review"
+   value={review}
+   onChange={(e) => setReview(e.target.value)}
+   sx={{ mb: 2 }}
+ />
 
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              placeholder="Write your review"
-              value={review}
-              onChange={(e) => setReview(e.target.value)}
-              sx={{ mb: 2 }}
-            />
+ <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+   <Button
+     type="submit"
+     variant="contained"
+     disabled={submitFeedbackLoading}
+     sx={{
+       bgcolor: "#2a7da5",
+       "&:hover": { bgcolor: "#1e6a8d" },
+     }}
+   >
+     {submitFeedbackLoading ? "Submitting..." : "Submit"}
+   </Button>
+ </Box>
+</Box>
 
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  bgcolor: "#2a7da5",
-                  "&:hover": { bgcolor: "#1e6a8d" },
-                }}
-              >
-                Submit
-              </Button>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-    </Container>
+{/* Display existing feedback */}
+<Box sx={{ mt: 4 }}>
+ {feedbackLoading ? (
+   <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
+     <CircularProgress size={24} />
+   </Box>
+ ) : feedbackError ? (
+   <Typography color="error">{feedbackError}</Typography>
+ ) : feedbacks.length > 0 ? (
+   feedbacks.map((feedback) => (
+     <Box key={feedback._id} sx={{ mb: 3, pb: 3, borderBottom: "1px solid #eee" }}>
+       <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+         <Box
+           sx={{
+             width: 32,
+             height: 32,
+             borderRadius: "50%",
+             bgcolor: "#f0f0f0",
+             display: "flex",
+             alignItems: "center",
+             justifyContent: "center",
+             mr: 1,
+             color: "#666",
+             fontSize: "0.75rem",
+           }}
+         >
+           {feedback.user_id?.fullName?.substring(0, 2).toUpperCase() || "UN"}
+         </Box>
+         <Typography variant="subtitle2">{feedback.user_id?.fullName || "Anonymous"}</Typography>
+       </Box>
+       <Rating value={feedback.rating} readOnly size="small" sx={{ mb: 1 }} />
+       <Typography variant="body2">{feedback.comment}</Typography>
+     </Box>
+   ))
+ ) : (
+   <Typography variant="body2" color="text.secondary" sx={{ my: 2 }}>
+     No reviews yet. Be the first to review this book!
+   </Typography>
+ )}
+</Box>
+</Grid>
+</Grid>
+</Container>
   )
 }
 
