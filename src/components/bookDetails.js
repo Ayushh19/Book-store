@@ -355,7 +355,7 @@ const handleSubmitReview = async (e) => {
           <Home sx={{ mr: 0.5 }} fontSize="inherit" />
           Home
         </Link>
-        <Typography color="text.primary">Book(59)</Typography>
+        <Typography color="text.primary">Book(77)</Typography>
        
       </Breadcrumbs>
 
@@ -401,7 +401,7 @@ const handleSubmitReview = async (e) => {
 
           {/* Quantity Control */}
           {addedToCart && (
-            <QuantityControl>
+            <QuantityControl sx={{ display: "flex", gap: 2, mt: 2,width:"82%",ml:"79px"}}>
               <QuantityButton onClick={() => handleQuantityChange(quantity - 1)} disabled={quantity <= 1}>
                 <Remove fontSize="small" />
               </QuantityButton>
@@ -430,7 +430,7 @@ const handleSubmitReview = async (e) => {
 
           {/* Action Buttons */}
           {!addedToCart && (
-            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+            <Box sx={{ display: "flex", gap: 2, mt: 2,width:"82%",ml:"79px"}}>
               <Button
                 variant="contained"
                 fullWidth
