@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { Container, Typography, Grid, Box, FormControl, Select, MenuItem, InputLabel, Pagination } from "@mui/material"
 import BookCard from "./bookCard"
-import { getBookImage, getRandomBookImage } from "../utils/bookImages"
+import { getBookImage,getConsistentBookImage, getRandomBookImage } from "../utils/bookImages"
 
 function BookList() {
   const [books, setBooks] = useState([])
@@ -29,14 +29,9 @@ function BookList() {
         if (data.success && data.result) {
           // Assign a random image to each book that doesn't have specific matches
           const booksWithImages = data.result.map((book) => {
-            // Create a temporary book object to check for image matches
-            const tempBook = {
-              title: book.bookName,
-              author: book.author,
-            }
-
+        
             // Get the appropriate image or a random one if no match
-            const imageUrl = getBookImage(tempBook) || getRandomBookImage()
+            const imageUrl = getConsistentBookImage(book._id)
 
             return {
               ...book,
@@ -180,4 +175,3 @@ function BookList() {
 }
 
 export default BookList
-

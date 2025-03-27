@@ -27,7 +27,7 @@ import {
 } from "@mui/material"
 import { Add, Remove, LocationOn, KeyboardArrowDown, Edit } from "@mui/icons-material"
 import { fetchCartItems, removeCartItem, updateCartItemQty } from "../redux/cartSlice"
-import { getRandomBookImage } from "../utils/bookImages"
+import { getConsistentBookImage } from "../utils/bookImages"
 
 const QuantityButton = styled(IconButton)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
@@ -237,7 +237,7 @@ function CartPage() {
             price: 150,
           }
 
-          const imageUrl = getRandomBookImage(book._id)
+          const imageUrl = getConsistentBookImage(book._id)
           const itemId = item._id || `local-${book._id}`
           const quantity = item.quantityToBuy || item.quantity || 1
 
@@ -479,7 +479,7 @@ function CartPage() {
               price: 2000,
             }
 
-            const imageUrl = getRandomBookImage(book._id)
+            const imageUrl = getConsistentBookImage(book._id)
 
             return (
               <Box key={item._id || book._id} sx={{ display: "flex", mb: 3 }}>

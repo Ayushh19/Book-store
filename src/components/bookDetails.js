@@ -21,7 +21,7 @@ import {
   IconButton,
 } from "@mui/material"
 import { Favorite, Home, Add, Remove } from "@mui/icons-material"
-import { getBookThumbnails,  getRandomBookImage } from "../utils/bookImages"
+import { getBookThumbnails, getBookImage, getRandomBookImage } from "../utils/bookImages"
 import { addToCart, addItemLocally } from "../redux/cartSlice"
 import axios from "axios"
 
@@ -104,7 +104,7 @@ const [submitFeedbackLoading, setSubmitFeedbackLoading] = useState(false)
             }
 
             // Get the main image and thumbnails
-            const mainImage = getRandomBookImage(foundBook._id)
+            const mainImage = getBookImage(foundBook._id)
             const thumbnails = getBookThumbnails(bookWithId)
 
             setBook({

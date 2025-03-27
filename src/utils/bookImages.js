@@ -1,143 +1,121 @@
-// Map of book titles or keywords to image paths
-const bookImageMap = {
-  // Exact title matches
-  "UX For DUMMIES": "/images/Image8@2x.png",
-  "Don't Make Me Think": "/images/Image20@2x.png",
-  "Mastering SharePoint Framework": "/images/Image22@2x.png",
-  "UX Design": "/images/Image10@2x.png",
-  "Lean UX": "/images/Image13@2x.png",
-  "The Design of Everyday Things": "/images/Image12@2x.png",
-  "React Material-UI": "/images/Image36@2x.png",
-  "The Alchemist": "/images/Image7@2x.png",
 
-  // Alternative versions
-  "Don't Make Me Think Revisited": "/images/Image11@2x.png",
-  "UX for Dummies": "/images/Image23@2x.png",
+
+// Array of available book cover images - we'll use 6 distinct images for our cycle
+const bookImages = [
+  "/images/Image8@2x.png", // UX for Dummies
+  "/images/Image36@2x.png", // React Material-UI
+  "/images/Image10@2x.png", // UX Design
+  "/images/Image20@2x.png", // Don't Make Me Think
+  "/images/Image12@2x.png", // Design of Everyday Things
+  "/images/Image22@2x.png", // Mastering SharePoint
+]
+
+// Additional images for thumbnails and variety
+const additionalImages = [
+  "/images/Image7@2x.png",
+  "/images/Image11@2x.png",
+  "/images/Image13@2x.png",
+  "/images/Image23@2x.png",
+]
+
+// All images combined for thumbnails
+const allImages = [...bookImages, ...additionalImages]
+
+/**
+ * Get a consistent book image based on book ID
+ * This function will always return the same image for the same book ID
+ * But it cycles through 6 different images to ensure variety on the page
+ */
+export const getConsistentBookImage = (bookId) => {
+  if (!bookId) return bookImages[0] // Default to first image if no ID
+
+  // Create a numeric hash from the book ID
+  let hash = 0
+  for (let i = 0; i < bookId.length; i++) {
+    hash = (hash << 5) - hash + bookId.charCodeAt(i)
+    hash = hash & hash // Convert to 32bit integer
+  }
+
+  // Make hash positive
+  hash = Math.abs(hash)
+
+  // Use modulo 6 to get an index between 0-5
+  // This ensures we cycle through our 6 main images
+  const index = hash % 6
+
+  return bookImages[index]
 }
 
-// Fallback images for different categories
-const categoryImages = {
-  UX: "/images/Image8@2x.png",
-  Design: "/images/Image12@2x.png",
-  Programming: "/images/Image36@2x.png",
-  React: "/images/Image36@2x.png",
-  SharePoint: "/images/Image22@2x.png",
-  Web: "/images/Image20@2x.png",
-  // default: "/images/Image10@2x.png",
-}
-
-// Keywords to category mapping
-const keywordToCategoryMap = {
-  ux: "UX",
-  design: "Design",
-  react: "React",
-  material: "React",
-  sharepoint: "SharePoint",
-  web: "Web",
-  usability: "Web",
-  programming: "Programming",
-  framework: "Programming",
-  cookbook: "Programming",
-}
-
-// Function to get image path based on book title or other properties
+/**
+ * Get book image - this is a wrapper around getConsistentBookImage
+ */
 export const getBookImage = (book) => {
-  // Check if we have an exact match for the title
-  for (const [key, path] of Object.entries(bookImageMap)) {
-    if (book.title && book.title.toLowerCase().includes(key.toLowerCase())) {
-      return path
-    }
+  // If we have a book ID, use the consistent image function
+  if (book.id || book._id) {
+    return getConsistentBookImage(book.id || book._id)
   }
 
-  // Check for keywords in the title to determine category
-  const title = book.title ? book.title.toLowerCase() : ""
-  for (const [keyword, category] of Object.entries(keywordToCategoryMap)) {
-    if (title.includes(keyword)) {
-      return categoryImages[category]
-    }
-  }
-
-  // Check author-based matches
-  if (book.author) {
-    const author = book.author.toLowerCase()
-    if (author.includes("krug")) {
-      return bookImageMap["Don't Make Me Think"]
-    }
-    if (author.includes("norman")) {
-      return bookImageMap["The Design of Everyday Things"]
-    }
-    if (author.includes("coelho")) {
-      return bookImageMap["The Alchemist"]
-    }
-  }
-
-  // Return default image if no match found
-  return categoryImages.default
+  // Return first image as default
+  return bookImages[0]
 }
 
-// Function to get multiple images for a book (for thumbnails)
+/**
+ * Get thumbnails for a book (for detail page)
+ * Returns an array of 3 images, with the main image as the first one
+ */
 export const getBookThumbnails = (book) => {
+  // Get the main image using our consistent function
   const mainImage = getBookImage(book)
+
+  // Create a set of thumbnails starting with the main image
   const thumbnails = [mainImage]
 
-  // Add alternative views based on book category
-  const title = book.title ? book.title.toLowerCase() : ""
+  // Get the book ID
+  const bookId = book.id || book._id || ""
 
-  // Add category-specific alternative views
-  if (title.includes("ux")) {
-    if (mainImage !== "/images/Image8@2x.png") thumbnails.push("/images/Image8@2x.png")
-    if (mainImage !== "/images/Image10@2x.png") thumbnails.push("/images/Image10@2x.png")
-  } else if (title.includes("design")) {
-    if (mainImage !== "/images/Image12@2x.png") thumbnails.push("/images/Image12@2x.png")
-    thumbnails.push("/images/Image7@2x.png")
-  } else if (title.includes("react") || title.includes("material")) {
-    thumbnails.push("/images/Image36@2x.png")
-    thumbnails.push("/images/Image22@2x.png")
-  } else if (title.includes("think") || book.author?.toLowerCase().includes("krug")) {
-    if (mainImage !== "/images/Image20@2x.png") thumbnails.push("/images/Image20@2x.png")
-    if (mainImage !== "/images/Image11@2x.png") thumbnails.push("/images/Image11@2x.png")
-  } else {
-    // Add some default alternatives if we don't have specific matches
-    if (mainImage !== "/images/Image7@2x.png") thumbnails.push("/images/Image7@2x.png")
-    if (mainImage !== "/images/Image13@2x.png") thumbnails.push("/images/Image13@2x.png")
+  // Create a numeric hash from the book ID
+  let hash = 0
+  for (let i = 0; i < bookId.length; i++) {
+    hash = (hash << 5) - hash + bookId.charCodeAt(i)
+    hash = hash & hash // Convert to 32bit integer
   }
 
-  // Ensure we have at least 3 thumbnails
-  if (thumbnails.length < 3) {
-    const possibleExtras = [
-      "/images/Image7@2x.png",
-      "/images/Image10@2x.png",
-      "/images/Image13@2x.png",
-      "/images/Image12@2x.png",
-    ]
+  // Make hash positive
+  hash = Math.abs(hash)
 
-    for (const extra of possibleExtras) {
-      if (!thumbnails.includes(extra)) {
-        thumbnails.push(extra)
-        if (thumbnails.length >= 3) break
-      }
+  // Select two more images that are different from the main image
+  // and different from each other
+  const secondIndex = (hash + 3) % allImages.length
+  let secondImage = allImages[secondIndex]
+
+  // Make sure second image is different from main image
+  if (secondImage === mainImage) {
+    secondImage = allImages[(secondIndex + 1) % allImages.length]
+  }
+
+  const thirdIndex = (hash + 7) % allImages.length
+  let thirdImage = allImages[thirdIndex]
+
+  // Make sure third image is different from main and second images
+  if (thirdImage === mainImage || thirdImage === secondImage) {
+    thirdImage = allImages[(thirdIndex + 1) % allImages.length]
+    if (thirdImage === mainImage || thirdImage === secondImage) {
+      thirdImage = allImages[(thirdIndex + 2) % allImages.length]
     }
   }
+
+  thumbnails.push(secondImage, thirdImage)
 
   return thumbnails
 }
 
-// Function to get a random book image (for books without specific matches)
-export const getRandomBookImage = () => {
-  const images = [
-    "/images/Image7@2x.png",
-    "/images/Image8@2x.png",
-    "/images/Image10@2x.png",
-    "/images/Image11@2x.png",
-    "/images/Image12@2x.png",
-    "/images/Image13@2x.png",
-    "/images/Image20@2x.png",
-    "/images/Image22@2x.png",
-    "/images/Image23@2x.png",
-    "/images/Image36@2x.png",
-  ]
+// This function is kept for backward compatibility but now uses the consistent approach
+export const getRandomBookImage = (bookId) => {
+  if (bookId) {
+    return getConsistentBookImage(bookId)
+  }
 
-  const randomIndex = Math.floor(Math.random() * images.length)
-  return images[randomIndex]
+  // If no ID is provided, return the first image as default
+  return bookImages[0]
 }
 
