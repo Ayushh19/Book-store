@@ -226,9 +226,8 @@ const handleSubmitReview = async (e) => {
 }
 
 
-
-   // Check if book is in wishlist
-   useEffect(() => {
+  // Check if book is in wishlist
+  useEffect(() => {
     if (book) {
       checkIfInWishlist(book.id)
     }
@@ -249,16 +248,18 @@ const handleSubmitReview = async (e) => {
       )
 
       if (response.data && response.data.result) {
-        const isInWishlist = response.data.result.some((item) => item.product_id._id === bookId)
+        const isInWishlist = response.data.result.some((item) => item.product_id && item.product_id._id === bookId)
         setIsAddedToWishlist(isInWishlist)
       }
     } catch (error) {
       console.error("Error checking wishlist:", error)
-      // For demo purposes, assume not in wishlist
-      setIsAddedToWishlist(false)
+
+      // Check localStorage as fallback
+      const localWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]")
+      const isInLocalWishlist = localWishlist.includes(bookId)
+      setIsAddedToWishlist(isInLocalWishlist)
     }
   }
-
 
   const handleAddToWishlist = async () => {
     if (book && !isAddedToWishlist) {
@@ -281,12 +282,26 @@ const handleSubmitReview = async (e) => {
         setIsAddedToWishlist(true)
         setSnackbarMessage("Added to wishlist")
         setSnackbarOpen(true)
+
+        // Store in localStorage for persistence
+        const localWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]")
+        if (!localWishlist.includes(book.id)) {
+          localWishlist.push(book.id)
+          localStorage.setItem("wishlist", JSON.stringify(localWishlist))
+        }
       } catch (error) {
         console.error("Error adding to wishlist:", error)
-        // For demo purposes, still mark as added
+
+        // Still add to localStorage for persistence even if API fails
         setIsAddedToWishlist(true)
         setSnackbarMessage("Added to wishlist")
         setSnackbarOpen(true)
+
+        const localWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]")
+        if (!localWishlist.includes(book.id)) {
+          localWishlist.push(book.id)
+          localStorage.setItem("wishlist", JSON.stringify(localWishlist))
+        }
       } finally {
         setWishlistLoading(false)
       }
@@ -416,14 +431,14 @@ const handleSubmitReview = async (e) => {
                 variant="contained"
                 startIcon={<Favorite />}
                 sx={{
-                  bgcolor: "#333",
-                  "&:hover": { bgcolor: "#222" },
+                  bgcolor: isAddedToWishlist ? "#555" : "#333",
+                  "&:hover": { bgcolor: isAddedToWishlist ? "#555" : "#222" },
                   ml: 2,
                 }}
                 onClick={handleAddToWishlist}
-                disabled={isAddedToWishlist}
+                disabled={isAddedToWishlist || wishlistLoading}
               >
-                {isAddedToWishlist ? "ADDED" : "WISHLIST"}
+                {wishlistLoading ? "ADDING..." : isAddedToWishlist ? "ADDED" : "WISHLIST"}
               </Button>
             </QuantityControl>
           )}
@@ -444,7 +459,7 @@ const handleSubmitReview = async (e) => {
               >
                 {cartLoading ? "ADDING..." : "ADD TO BAG"}
               </Button>
-               <Button
+              <Button
                 variant="contained"
                 fullWidth
                 startIcon={<Favorite />}
@@ -456,7 +471,7 @@ const handleSubmitReview = async (e) => {
                 onClick={handleAddToWishlist}
                 disabled={isAddedToWishlist || wishlistLoading}
               >
-                {isAddedToWishlist ? "ADDED" : "WISHLIST"}
+                {wishlistLoading ? "ADDING..." : isAddedToWishlist ? "ADDED" : "WISHLIST"}
               </Button>
             </Box>
           )}

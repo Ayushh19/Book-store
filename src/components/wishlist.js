@@ -1,3 +1,5 @@
+
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -58,36 +60,57 @@ function WishlistPage() {
       )
 
       if (response.data && response.data.result) {
-        setWishlistItems(response.data.result)
+        // Filter out items with null product_id
+        const validItems = response.data.result.filter((item) => item.product_id)
+        setWishlistItems(validItems)
       } else {
         setWishlistItems([])
       }
     } catch (error) {
       console.error("Error fetching wishlist items:", error)
       setError(error.response?.data?.message || "Failed to fetch wishlist items")
-      // Set mock data for demo purposes
-      setWishlistItems([
-        {
-          _id: "mock-1",
+
+      // Try to load from localStorage as fallback
+      const localWishlistIds = JSON.parse(localStorage.getItem("wishlist") || "[]")
+
+      if (localWishlistIds.length > 0) {
+        // Create mock wishlist items from local storage IDs
+        const mockItems = localWishlistIds.map((id) => ({
+          _id: `local-${id}`,
           product_id: {
-            _id: "5f4fd116c277b45b384559a5",
-            bookName: "Don't Make Me Think",
-            author: "Steve Krug",
-            discountPrice: 1500,
-            price: 2000,
+            _id: id,
+            bookName: "Book Title", // You might want to fetch actual book details here
+            author: "Author",
+            discountPrice: 1000,
+            price: 1500,
           },
-        },
-        {
-          _id: "mock-2",
-          product_id: {
-            _id: "5f4fd116c277b45b384559a6",
-            bookName: "React Material-UI",
-            author: "Cookbook",
-            discountPrice: 780,
-            price: 1000,
+        }))
+        setWishlistItems(mockItems)
+      } else {
+        // Set mock data for demo purposes
+        setWishlistItems([
+          {
+            _id: "mock-1",
+            product_id: {
+              _id: "5f4fd116c277b45b384559a5",
+              bookName: "Don't Make Me Think",
+              author: "Steve Krug",
+              discountPrice: 1500,
+              price: 2000,
+            },
           },
-        },
-      ])
+          {
+            _id: "mock-2",
+            product_id: {
+              _id: "5f4fd116c277b45b384559a6",
+              bookName: "React Material-UI",
+              author: "Cookbook",
+              discountPrice: 780,
+              price: 1000,
+            },
+          },
+        ])
+      }
     } finally {
       setLoading(false)
     }
@@ -111,10 +134,20 @@ function WishlistPage() {
 
       // Remove item from local state
       setWishlistItems((prevItems) => prevItems.filter((item) => item.product_id._id !== productId))
+
+      // Also remove from localStorage
+      const localWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]")
+      const updatedWishlist = localWishlist.filter((id) => id !== productId)
+      localStorage.setItem("wishlist", JSON.stringify(updatedWishlist))
     } catch (error) {
       console.error("Error removing wishlist item:", error)
       // For demo purposes, still remove from UI
       setWishlistItems((prevItems) => prevItems.filter((item) => item.product_id._id !== productId))
+
+      // Also remove from localStorage
+      const localWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]")
+      const updatedWishlist = localWishlist.filter((id) => id !== productId)
+      localStorage.setItem("wishlist", JSON.stringify(updatedWishlist))
     }
   }
 
@@ -194,6 +227,9 @@ function WishlistPage() {
         ) : (
           <Box>
             {wishlistItems.map((item) => {
+              // Skip rendering if product_id is null
+              if (!item.product_id) return null
+
               const book = item.product_id
               const imageUrl = getRandomBookImage(book._id)
 
